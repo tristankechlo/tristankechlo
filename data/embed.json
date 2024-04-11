@@ -1,0 +1,34 @@
+{
+    "content": ":exclamation: New version for @ping@ just released :exclamation:",
+    "embeds": [
+        {
+            "description": "@description@",
+            "color": "@color@",
+            "fields": [
+                {
+                    "name": "Changelog",
+                    "value": "```md\n@changelog@\n```",
+                    "inline": false
+                },
+                {
+                    "name": "Minecraft Version",
+                    "value": "@minecraft@",
+                    "inline": true
+                },
+                {
+                    "name": "Mod Version",
+                    "value": "@version@",
+                    "inline": true
+                },
+                {
+                    "name": "Project Pages",
+                    "value": "CF-Emoji [Curseforge](@curseforge@)\nMR-Emoji [Modrinth](@modrinth@)",
+                    "inline": false
+                }
+            ],
+            "timestamp": "@timestamp@"
+        }
+    ],
+    "username": "TK's Mod Releases",
+    "avatar_url": "@avatar@"
+}

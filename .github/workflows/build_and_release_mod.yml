@@ -1,0 +1,148 @@
+name: Build and Publish Release
+
+on:
+  workflow_call:
+    inputs:
+      modid:
+        required: true
+        type: string
+      mc-version:
+        required: true
+        type: string
+      mod-version:
+        required: true
+        type: string
+      curseforge-id:
+        required: true
+        type: number
+      modrinth-id:
+        required: true
+        type: string
+      changelog:
+        required: true
+        type: string
+      forge:
+        required: false
+        type: boolean
+        default: true
+      fabric:
+        required: false
+        type: boolean
+        default: true
+      neoforge:
+        required: false
+        type: boolean
+        default: true
+      version-range:
+        required: true
+        type: string
+    secrets:
+      curseforge-token:
+        required: true
+      modrinth-token:
+        required: true
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Sourcecode
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Execute Gradle build
+        run: ./gradlew build
+
+      - name: Create Github Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: "${{ inputs.mc-version }} - ${{ inputs.mod-version }}"
+          tag: ${{ github.ref }}
+          artifacts: "build/libs/${{ inputs.modid }}-*.jar"
+          replacesArtifacts: false
+          body: ${{ inputs.changelog }}
+
+      - name: publish Forge
+        if: ${{ inputs.forge == true }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ inputs.modrinth-id }}
+          modrinth-featured: true
+          modrinth-unfeature-mode: intersection
+          modrinth-token: ${{ secrets.modrinth-token }}
+          curseforge-id: ${{ inputs.curseforge-id }}
+          curseforge-token: ${{ secrets.curseforge-token }}
+          name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Forge
+          version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Forge
+          version-type: release
+          loaders: forge
+          files: Forge/build/libs/*.jar
+          changelog: ${{ inputs.changelog }}
+          game-versions: ${{ inputs.version-range }}
+          game-version-filter: releases
+
+      - name: publish Fabric
+        if: ${{ inputs.fabric == true }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ inputs.modrinth-id }}
+          modrinth-featured: true
+          modrinth-unfeature-mode: intersection
+          modrinth-token: ${{ secrets.modrinth-token }}
+          curseforge-id: ${{ inputs.curseforge-id }}
+          curseforge-token: ${{ secrets.curseforge-token }}
+          name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Fabric
+          version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Fabric
+          version-type: release
+          loaders: fabric
+          files: Fabric/build/libs/*.jar
+          changelog: ${{ inputs.changelog }}
+          game-versions: ${{ inputs.version-range }}
+          dependencies: fabric-api(required)
+          game-version-filter: releases
+
+      - name: publish NeoForge
+        if: ${{ inputs.neoforge == true }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ inputs.modrinth-id }}
+          modrinth-featured: true
+          modrinth-unfeature-mode: intersection
+          modrinth-token: ${{ secrets.modrinth-token }}
+          curseforge-id: ${{ inputs.curseforge-id }}
+          curseforge-token: ${{ secrets.curseforge-token }}
+          name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - NeoForge
+          version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-NeoForge
+          version-type: release
+          loaders: neoforge
+          files: Neoforge/build/libs/*.jar
+          changelog: ${{ inputs.changelog }}
+          game-versions: ${{ inputs.version-range }}
+          game-version-filter: releases
+      
+# - name: Publish Files
+#   shell: bash
+#   env:
+#     MODRINTH_TOKEN: ${{ secrets.modrinth-token }}
+#     MODRINTH_PROJECT_ID: ${{ inputs.modrinth-id }}
+#     CURSEFORGE_TOKEN: ${{ secrets.curseforge-token }}
+#     CURSEFORGE_PROJECT_ID: ${{ inputs.curseforge-id }}
+#     MC_VERSION: ${{ inputs.mc-version }}
+#     MOD_VERSION: ${{ inputs.mod-version }}
+#     FILENAME_FORGE: "./forge/build/libs/${{ inputs.modid }}-forge-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
+#     FILENAME_FABRIC: "./fabric/build/libs/${{ inputs.modid }}-fabric-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
+#     FILENAME_NEOFORGE: "./neoforge/build/libs/${{ inputs.modid }}-neoforge-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
+#   run: |
+#     wget -q -O './release_curseforge.sh' "https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/scripts/release_curseforge.sh"
+#     wget -q -O './release_modrinth.sh' "https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/scripts/release_modrinth.sh"
+#     ./release_curseforge.sh
+#     ./release_modrinth.sh

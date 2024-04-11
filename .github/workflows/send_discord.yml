@@ -1,0 +1,62 @@
+name: Send Discord Message Mod-Release
+
+on:
+  workflow_call:
+    inputs:
+      changelog:
+        required: true
+        type: string
+      mc-version:
+        required: true
+        type: string
+      mod-version:
+        required: true
+        type: string
+      color:
+        required: true
+        type: number      
+      ping:
+        required: true
+        type: string
+      curseforge:
+        required: true
+        type: string
+      modrinth:
+        required: true
+        type: string
+      description:
+        required: true
+        type: string
+      avatar:
+        required: true
+        type: string
+    secrets:
+      webhook-url:
+        required: true
+
+jobs:
+  send-embed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: prepare Discord Message
+        shell: bash
+        run: |
+          URL="https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/data/embed.json"
+          wget -q -O './embed.json' "$URL"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          sed -i 's/@timestamp@/'"$TIMESTAMP"'/g' ./embed.json
+          sed -i 's/@changelog@/'"${{ inputs.changelog }}"'/g' ./embed.json
+          sed -i 's/@minecraft@/'"${{ inputs.mc-version }}"'/g' ./embed.json
+          sed -i 's/@version@/'"${{ inputs.mod-version }}"'/g' ./embed.json
+          sed -i 's/\"@color@\"/'"${{ inputs.color }}"'/g' ./embed.json
+          sed -i 's/@ping@/'"${{ inputs.ping }}"'/g' ./embed.json
+          sed -i 's/@curseforge@/'"${{ inputs.curseforge }}"'/g' ./embed.json
+          sed -i 's/@modrinth@/'"${{ inputs.modrinth }}"'/g' ./embed.json
+          sed -i 's/@avatar@/'"${{ inputs.avatar }}"'/g' ./embed.json
+          sed -i 's/@description@/'"${{ inputs.description }}"'/g' ./embed.json
+
+      - name: Send Discord Message
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.webhook-url }}
+          raw-data: ./embed.json
