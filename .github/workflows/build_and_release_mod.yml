@@ -1,5 +1,7 @@
 name: Build and Publish Release
 
+# trigger this workflow when a new release is published
+
 on:
   workflow_call:
     inputs:
@@ -61,15 +63,21 @@ jobs:
       - name: Execute Gradle build
         run: ./gradlew build
 
-      - name: Create Github Release
-        uses: ncipollo/release-action@v1
+      - name: Add files to release
+        uses: shogo82148/actions-upload-release-asset@v1.7.5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: "${{ inputs.mc-version }} - ${{ inputs.mod-version }}"
-          tag: ${{ github.ref }}
-          artifacts: "build/libs/${{ inputs.modid }}-*.jar"
-          replacesArtifacts: false
-          body: ${{ inputs.changelog }}
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "${{ github.workspace }}/*/build/libs/${{ inputs.modid }}-*.jar"
+
+#      - name: Create Github Release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          name: "${{ inputs.mc-version }} - ${{ inputs.mod-version }}"
+#          tag: ${{ github.ref }}
+#          artifacts: "build/libs/${{ inputs.modid }}-*.jar"
+#          replacesArtifacts: false
+#          body: ${{ inputs.changelog }}
 
       - name: publish Forge
         if: ${{ inputs.forge == true }}
@@ -79,13 +87,15 @@ jobs:
           modrinth-featured: true
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
+          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Forge
+          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Forge
           curseforge-id: ${{ inputs.curseforge-id }}
           curseforge-token: ${{ secrets.curseforge-token }}
-          name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Forge
-          version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Forge
+          curseforge-name: ""
+          curseforge-version: ""
           version-type: release
           loaders: forge
-          files: Forge/build/libs/*.jar
+          files: ${{ github.workspace }}/Forge/build/libs/*.jar
           changelog: ${{ inputs.changelog }}
           game-versions: ${{ inputs.version-range }}
           game-version-filter: releases
@@ -98,13 +108,15 @@ jobs:
           modrinth-featured: true
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
+          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Fabric
+          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Fabric
           curseforge-id: ${{ inputs.curseforge-id }}
           curseforge-token: ${{ secrets.curseforge-token }}
-          name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Fabric
-          version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Fabric
+          curseforge-name: ""
+          curseforge-version: ""
           version-type: release
           loaders: fabric
-          files: Fabric/build/libs/*.jar
+          files: ${{ github.workspace }}/Fabric/build/libs/*.jar
           changelog: ${{ inputs.changelog }}
           game-versions: ${{ inputs.version-range }}
           dependencies: fabric-api(required)
@@ -118,13 +130,15 @@ jobs:
           modrinth-featured: true
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
+          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - NeoForge
+          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-NeoForge
           curseforge-id: ${{ inputs.curseforge-id }}
           curseforge-token: ${{ secrets.curseforge-token }}
-          name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - NeoForge
-          version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-NeoForge
+          curseforge-name: ""
+          curseforge-version: ""
           version-type: release
           loaders: neoforge
-          files: Neoforge/build/libs/*.jar
+          files: ${{ github.workspace }}/Neoforge/build/libs/*.jar
           changelog: ${{ inputs.changelog }}
           game-versions: ${{ inputs.version-range }}
           game-version-filter: releases
