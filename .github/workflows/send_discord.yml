@@ -44,16 +44,16 @@ jobs:
           URL="https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/data/embed.json"
           wget -q -O './embed.json' "$URL"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          sed -i 's/@timestamp@/'"$TIMESTAMP"'/g' ./embed.json
-          sed -i 's/@changelog@/'"${{ inputs.changelog }}"'/g' ./embed.json
-          sed -i 's/@minecraft@/'"${{ inputs.mc-version }}"'/g' ./embed.json
-          sed -i 's/@version@/'"${{ inputs.mod-version }}"'/g' ./embed.json
-          sed -i 's/\"@color@\"/'"${{ inputs.color }}"'/g' ./embed.json
-          sed -i 's/@ping@/'"${{ inputs.ping }}"'/g' ./embed.json
-          sed -i 's/@curseforge@/'"${{ inputs.curseforge }}"'/g' ./embed.json
-          sed -i 's/@modrinth@/'"${{ inputs.modrinth }}"'/g' ./embed.json
-          sed -i 's/@avatar@/'"${{ inputs.avatar }}"'/g' ./embed.json
-          sed -i 's/@description@/'"${{ inputs.description }}"'/g' ./embed.json
+          sed -i "s|@timestamp@|${TIMESTAMP}|g" ./embed.json
+          sed -i "s|@changelog@|"${{ inputs.changelog }}"|g" ./embed.json
+          sed -i "s|@minecraft@/"${{ inputs.mc-version }}"|g" ./embed.json
+          sed -i "s|@version@|"${{ inputs.mod-version }}"|g" ./embed.json
+          sed -i "s|\"@color@|"/${{ inputs.color }}|g" ./embed.json
+          sed -i "s|@ping@|"${{ inputs.ping }}"|g" ./embed.json
+          sed -i "s|@curseforge@|"${{ inputs.curseforge }}"|g" ./embed.json
+          sed -i "s|@modrinth@|"${{ inputs.modrinth }}"|g" ./embed.json
+          sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
+          sed -i "s|@description@|"${{ inputs.description }}"|g" ./embed.json
 
       - name: Send Discord Message
         uses: tsickert/discord-webhook@v5.3.0
