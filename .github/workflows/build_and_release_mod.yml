@@ -82,23 +82,23 @@ jobs:
 #          replacesArtifacts: false
 #          body: ${{ inputs.changelog }}
 
-      - name: publish Forge
-        if: ${{ inputs.forge == true }}
+      - name: publish NeoForge
+        if: ${{ inputs.neoforge == true }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ inputs.modrinth-id }}
           modrinth-featured: true
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
-          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Forge
-          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Forge
+          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - NeoForge
+          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-NeoForge
           curseforge-id: ${{ inputs.curseforge-id }}
           curseforge-token: ${{ secrets.curseforge-token }}
           curseforge-name: ""
           curseforge-version: ""
           version-type: release
-          loaders: forge
-          files: ${{ github.workspace }}/Forge/build/libs/*.jar
+          loaders: neoforge
+          files: ${{ github.workspace }}/Neoforge/build/libs/*.jar
           changelog: ${{ inputs.changelog }}
           game-versions: ${{ inputs.version-range }}
           game-version-filter: releases
@@ -125,23 +125,23 @@ jobs:
           dependencies: fabric-api(required)
           game-version-filter: releases
 
-      - name: publish NeoForge
-        if: ${{ inputs.neoforge == true }}
+      - name: publish Forge
+        if: ${{ inputs.forge == true }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ inputs.modrinth-id }}
           modrinth-featured: true
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
-          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - NeoForge
-          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-NeoForge
+          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Forge
+          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Forge
           curseforge-id: ${{ inputs.curseforge-id }}
           curseforge-token: ${{ secrets.curseforge-token }}
           curseforge-name: ""
           curseforge-version: ""
           version-type: release
-          loaders: neoforge
-          files: ${{ github.workspace }}/Neoforge/build/libs/*.jar
+          loaders: forge
+          files: ${{ github.workspace }}/Forge/build/libs/*.jar
           changelog: ${{ inputs.changelog }}
           game-versions: ${{ inputs.version-range }}
           game-version-filter: releases
