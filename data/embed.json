@@ -22,7 +22,7 @@
                 },
                 {
                     "name": "Project Pages",
-                    "value": "CF-Emoji [Curseforge](@curseforge@)\nMR-Emoji [Modrinth](@modrinth@)",
+                    "value": ":curseforge: [Curseforge](@curseforge@)\n:modrinth: [Modrinth](@modrinth@)",
                     "inline": false
                 }
             ],
