@@ -22,7 +22,7 @@
                 },
                 {
                     "name": "Project Pages",
-                    "value": ":curseforge: [Curseforge](@curseforge@)\n:modrinth: [Modrinth](@modrinth@)",
+                    "value": "<:curseforge:938093919848267807> [Curseforge](@curseforge@)\n<:modrinth:977251171980963890> [Modrinth](@modrinth@)",
                     "inline": false
                 }
             ],
