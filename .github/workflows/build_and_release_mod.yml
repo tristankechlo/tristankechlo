@@ -70,7 +70,7 @@ jobs:
         uses: shogo82148/actions-upload-release-asset@v1.7.5
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: "${{ github.workspace }}/*/build/libs/${{ inputs.modid }}-*.jar"
+          asset_path: "${{ github.workspace }}/+(Fabric|Forge|Neoforge)/build/libs/${{ inputs.modid }}-*.jar"
 
 #      - name: Create Github Release
 #        uses: ncipollo/release-action@v1
