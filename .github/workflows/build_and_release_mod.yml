@@ -72,16 +72,6 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: "${{ github.workspace }}/*(Fabric|Forge|Neoforge)/build/libs/${{ inputs.modid }}-*.jar"
 
-#      - name: Create Github Release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          name: "${{ inputs.mc-version }} - ${{ inputs.mod-version }}"
-#          tag: ${{ github.ref }}
-#          artifacts: "build/libs/${{ inputs.modid }}-*.jar"
-#          replacesArtifacts: false
-#          body: ${{ inputs.changelog }}
-
       - name: publish NeoForge
         if: ${{ inputs.neoforge == true }}
         uses: Kir-Antipov/mc-publish@v3.3
@@ -145,21 +135,3 @@ jobs:
           changelog: ${{ inputs.changelog }}
           game-versions: ${{ inputs.version-range }}
           game-version-filter: releases
-      
-# - name: Publish Files
-#   shell: bash
-#   env:
-#     MODRINTH_TOKEN: ${{ secrets.modrinth-token }}
-#     MODRINTH_PROJECT_ID: ${{ inputs.modrinth-id }}
-#     CURSEFORGE_TOKEN: ${{ secrets.curseforge-token }}
-#     CURSEFORGE_PROJECT_ID: ${{ inputs.curseforge-id }}
-#     MC_VERSION: ${{ inputs.mc-version }}
-#     MOD_VERSION: ${{ inputs.mod-version }}
-#     FILENAME_FORGE: "./forge/build/libs/${{ inputs.modid }}-forge-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
-#     FILENAME_FABRIC: "./fabric/build/libs/${{ inputs.modid }}-fabric-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
-#     FILENAME_NEOFORGE: "./neoforge/build/libs/${{ inputs.modid }}-neoforge-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
-#   run: |
-#     wget -q -O './release_curseforge.sh' "https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/scripts/release_curseforge.sh"
-#     wget -q -O './release_modrinth.sh' "https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/scripts/release_modrinth.sh"
-#     ./release_curseforge.sh
-#     ./release_modrinth.sh
