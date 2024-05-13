@@ -1,44 +1,12 @@
 name: Send Discord Message Mod-Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      changelog:
-        required: true
-        type: string
-      mc-version:
-        required: true
-        type: string
-      mod-version:
-        required: true
-        type: string
-      color:
-        required: true
-        type: number      
-      ping:
-        required: true
-        type: string
-      curseforge:
-        required: true
-        type: string
-      modrinth:
-        required: true
-        type: string
-      description:
-        required: true
-        type: string
-      avatar:
-        required: true
-        type: string
   workflow_call:
     inputs:
       changelog:
         required: true
         type: string
-      mc-version:
-        required: true
-        type: string
-      mod-version:
+      version:
         required: true
         type: string
       color:
@@ -53,10 +21,13 @@ on:
       modrinth:
         required: true
         type: string
+      title:
+        required: true
+        type: string
       description:
         required: true
         type: string
-      avatar:
+      thumbnail:
         required: true
         type: string
     secrets:
@@ -91,15 +62,15 @@ jobs:
           changelog = changelog.replace("\n", "\\n")
           
           data = data.replace("@ping@", "${{ inputs.ping }}")
+          data = data.replace("@title@", "${{ inputs.title }}")
           data = data.replace("@description@", "${{ inputs.description }}")
           data = data.replace("\"@color@\"", "${{ inputs.color }}")
           data = data.replace("@changelog@", changelog)
-          data = data.replace("@minecraft@", "${{ inputs.mc-version }}")
-          data = data.replace("@version@", "${{ inputs.mod-version }}")
+          data = data.replace("@version@", "${{ inputs.version }}")
           data = data.replace("@curseforge@", "${{ inputs.curseforge }}")
           data = data.replace("@modrinth@", "${{ inputs.modrinth }}")
           data = data.replace("@timestamp@", datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z")
-          data = data.replace("@avatar@", "${{ inputs.avatar }}")
+          data = data.replace("@thumbnail@", "${{ inputs.thumbnail }}")
           
           data = json.dumps(json.loads(data))
           

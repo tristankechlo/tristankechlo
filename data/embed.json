@@ -1,34 +1,36 @@
 {
-    "content": ":exclamation: New version for @ping@ just released :exclamation:",
+    "content": "@ping@",
     "embeds": [
         {
-            "description": "@description@",
             "color": "@color@",
             "fields": [
+                {
+                    "name": "@title@",
+                    "value": "@description@",
+                    "inline": false
+                },
                 {
                     "name": "Changelog",
                     "value": "```md\n@changelog@\n```",
                     "inline": false
                 },
                 {
-                    "name": "Minecraft Version",
-                    "value": "@minecraft@",
-                    "inline": true
-                },
-                {
-                    "name": "Mod Version",
-                    "value": "@version@",
-                    "inline": true
-                },
-                {
                     "name": "Project Pages",
                     "value": "<:curseforge:938093919848267807> [Curseforge](@curseforge@)\n<:modrinth:977251171980963890> [Modrinth](@modrinth@)",
-                    "inline": false
+                    "inline": true
+                },
+                {
+                    "name": "New Version",
+                    "value": "@version@",
+                    "inline": true
                 }
             ],
-            "timestamp": "@timestamp@"
+            "timestamp": "@timestamp@",
+            "thumbnail": {
+                "url": "@thumbnail@"
+            }
         }
     ],
     "username": "TK's Mod Releases",
-    "avatar_url": "@avatar@"
+    "avatar_url": "https://cdn.modrinth.com/data/UKDLi1GJ/d345468b19bfd5ffffa1ed070297a6a74535e9d6.png"
 }
