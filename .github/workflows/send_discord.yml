@@ -102,12 +102,12 @@ jobs:
           sed -i "s|@description@|${DESCRIPTION}|g" ./embed.json
 
           echo $(cat ./embed.json) > embed.json
-          echo "$(cat ./embed.json | jq)"
+          echo "$(python -mjson.tool ./embed.json)"
 
           echo "# Discord Message" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
-          echo -e "$(cat ./embed.json | jq)" >> $GITHUB_STEP_SUMMARY
+          echo -e "$(python -mjson.tool ./embed.json)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Message
