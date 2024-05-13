@@ -66,11 +66,18 @@ jobs:
       - name: Execute Gradle build
         run: ./gradlew build
 
+      - name: copy jar-files
+        shell: bash
+        run: |
+          mkdir ./dist
+          mv ./*(Forge|Fabric|Neoforge)/**/${{ inputs.modid }}-*.jar ./dist
+          ls -l ./dist
+
       - name: Add files to release
         uses: shogo82148/actions-upload-release-asset@v1.7.5
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: "${{ github.workspace }}/*(Fabric|Forge|Neoforge)/build/libs/${{ inputs.modid }}-*.jar"
+          asset_path: "./dist/${{ inputs.modid }}-*.jar"
 
       - name: publish NeoForge
         if: ${{ inputs.neoforge == true }}
