@@ -85,7 +85,7 @@ jobs:
             mv ./Neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
           fi
 
-          echo -e "${ls -l ./dist}"
+          echo -e "$(ls -lahG ./dist)"
 
       - name: Add files to release
         uses: shogo82148/actions-upload-release-asset@v1.7.5
