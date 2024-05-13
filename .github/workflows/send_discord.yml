@@ -90,7 +90,7 @@ jobs:
           changelog = changelog.strip()
           changelog = changelog.replace("\n", "\\n")
           
-          data = data.replace("@ping@", "${{ inputs.ping }}>")
+          data = data.replace("@ping@", "${{ inputs.ping }}")
           data = data.replace("@description@", "${{ inputs.description }}")
           data = data.replace("\"@color@\"", "${{ inputs.color }}")
           data = data.replace("@changelog@", changelog)
