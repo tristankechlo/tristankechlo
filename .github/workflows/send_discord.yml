@@ -101,12 +101,13 @@ jobs:
           sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
           sed -i "s|@description@|${DESCRIPTION}|g" ./embed.json
 
-          echo -e "$(cat ./embed.json)"
+          echo $(cat ./embed.json) > embed.json
+          echo "$(cat ./embed.json | jq)"
 
           echo "# Discord Message" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
-          echo -e "$(cat ./embed.json)" >> $GITHUB_STEP_SUMMARY
+          echo -e "$(cat ./embed.json | jq)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Message
