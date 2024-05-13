@@ -99,6 +99,8 @@ jobs:
           sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
           sed -i "s|@description@|${DESCRIPTION}|g" ./embed.json
 
+          cat ./embed.json
+
       - name: Send Discord Message
         uses: tsickert/discord-webhook@v5.3.0
         with:
