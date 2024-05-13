@@ -70,9 +70,10 @@ jobs:
         shell: bash
         run: |
           mkdir ./dist
-          mv ./Forge/**/${{ inputs.modid }}-*.jar ./dist
-          mv ./Fabric/**/${{ inputs.modid }}-*.jar ./dist
-          mv ./Neoforge/**/${{ inputs.modid }}-*.jar ./dist
+          ls -l ./Forge/build/libs/
+          mv ./Forge/build/libs/${{ inputs.modid }}-*.jar ./dist
+          mv ./Fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
+          mv ./Neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
           ls -l ./dist
 
       - name: Add files to release
