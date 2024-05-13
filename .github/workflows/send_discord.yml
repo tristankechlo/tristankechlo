@@ -93,7 +93,7 @@ jobs:
           sed -i "s|@minecraft@|"${{ inputs.mc-version }}"|g" ./embed.json
           sed -i "s|@version@|"${{ inputs.mod-version }}"|g" ./embed.json
           sed -i "s|\"@color@\"|"${{ inputs.color }}"|g" ./embed.json
-          sed -i "s|@ping@|"${{ inputs.ping }}"|g" ./embed.json
+          sed -i "s|@ping@|${{ inputs.ping }}|g" ./embed.json
           sed -i "s|@curseforge@|"${{ inputs.curseforge }}"|g" ./embed.json
           sed -i "s|@modrinth@|"${{ inputs.modrinth }}"|g" ./embed.json
           sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
