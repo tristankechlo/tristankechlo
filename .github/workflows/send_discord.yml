@@ -83,7 +83,7 @@ jobs:
           DESCRIPTION=${DESCRIPTION//\"/\\\\\"}
           DESCRIPTION=${DESCRIPTION//&/\\&}
 
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          TIMESTAMP=$(date "+%FT%T.%3NZ")
 
           URL="https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/data/embed.json"
           wget -q -O './embed.json' "$URL"
