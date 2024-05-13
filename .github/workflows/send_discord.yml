@@ -70,40 +70,46 @@ jobs:
       - name: Checkout Sourcecode
         uses: actions/checkout@v4
 
-      - name: prepare Discord Message
+      - name: Download Template
         shell: bash
         run: |
-          CHANGELOG="${{ inputs.changelog }}"
-          CHANGELOG=$(echo "$CHANGELOG" | tr '/' '\n')
-          CHANGELOG=${CHANGELOG//$'\n'/\\\\n}
-          CHANGELOG=${CHANGELOG//\"/\\\\\"}
-          CHANGELOG=${CHANGELOG//&/\\&}
-
-          DESCRIPTION="${{ inputs.description }}"
-          DESCRIPTION=$(echo "$DESCRIPTION" | tr '/' '\n')
-          DESCRIPTION=${DESCRIPTION//$'\n'/\\\\n}
-          DESCRIPTION=${DESCRIPTION//\"/\\\\\"}
-          DESCRIPTION=${DESCRIPTION//&/\\&}
-
-          TIMESTAMP=$(date "+%FT%T.%3NZ")
-
           URL="https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/data/embed.json"
           wget -q -O './embed.json' "$URL"
 
-          sed -i "s|@timestamp@|${TIMESTAMP}|g" ./embed.json
-          sed -i "s|@changelog@|${CHANGELOG}|" ./embed.json
-          sed -i "s|@minecraft@|"${{ inputs.mc-version }}"|g" ./embed.json
-          sed -i "s|@version@|"${{ inputs.mod-version }}"|g" ./embed.json
-          sed -i "s|\"@color@\"|"${{ inputs.color }}"|g" ./embed.json
-          sed -i "s|@ping@|${{ inputs.ping }}|g" ./embed.json
-          sed -i "s|@curseforge@|"${{ inputs.curseforge }}"|g" ./embed.json
-          sed -i "s|@modrinth@|"${{ inputs.modrinth }}"|g" ./embed.json
-          sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
-          sed -i "s|@description@|${DESCRIPTION}|g" ./embed.json
+      - name: Prepare Template
+        shell: python
+        run: |
+          import datetime
+          import json
+          
+          with open("./embed.json", "r") as f:
+            data = f.read()
+            f.close()
+          
+          changelog="""${{ inputs.changelog }}"""
+          changelog = changelog.strip()
+          changelog = changelog.replace("\n", "\\n")
+          
+          data = data.replace("@ping@", "${{ inputs.ping }}>")
+          data = data.replace("@description@", "${{ inputs.description }}")
+          data = data.replace("\"@color@\"", "${{ inputs.color }}")
+          data = data.replace("@changelog@", changelog)
+          data = data.replace("@minecraft@", "${{ inputs.mc-version }}")
+          data = data.replace("@version@", "${{ inputs.mod-version }}")
+          data = data.replace("@curseforge@", "${{ inputs.curseforge }}")
+          data = data.replace("@modrinth@", "${{ inputs.modrinth }}")
+          data = data.replace("@timestamp@", datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z")
+          data = data.replace("@avatar@", "${{ inputs.avatar }}")
+          
+          data = json.dumps(json.loads(data))
+          
+          with open("./embed.json", "w") as f:
+            f.write(data)
+            f.close()
 
-          echo $(cat ./embed.json) > embed.json
-          echo "$(python -mjson.tool ./embed.json)"
-
+      - name: Display Template
+        shell: bash
+        run: |
           echo "# Discord Message" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
