@@ -74,11 +74,13 @@ jobs:
         shell: bash
         run: |
           CHANGELOG="${{ inputs.changelog }}"
+          CHANGELOG=$(echo "$CHANGELOG" | tr '/' '\n')
           CHANGELOG=${CHANGELOG//$'\n'/\\\\n}
           CHANGELOG=${CHANGELOG//\"/\\\\\"}
           CHANGELOG=${CHANGELOG//&/\\&}
 
           DESCRIPTION="${{ inputs.description }}"
+          DESCRIPTION=$(echo "$DESCRIPTION" | tr '/' '\n')
           DESCRIPTION=${DESCRIPTION//$'\n'/\\\\n}
           DESCRIPTION=${DESCRIPTION//\"/\\\\\"}
           DESCRIPTION=${DESCRIPTION//&/\\&}
@@ -98,6 +100,8 @@ jobs:
           sed -i "s|@modrinth@|"${{ inputs.modrinth }}"|g" ./embed.json
           sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
           sed -i "s|@description@|${DESCRIPTION}|g" ./embed.json
+
+          echo -e "$(cat ./embed.json)"
 
           echo "# Discord Message" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
