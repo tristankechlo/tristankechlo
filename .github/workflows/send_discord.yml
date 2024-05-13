@@ -67,6 +67,9 @@ jobs:
   send-discord-embed:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Sourcecode
+        uses: actions/checkout@v4
+
       - name: prepare Discord Message
         shell: bash
         run: |
