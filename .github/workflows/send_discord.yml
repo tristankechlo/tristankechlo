@@ -102,8 +102,7 @@ jobs:
           echo "# Discord Message" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
-          FILE=$(cat ./embed.json)
-          echo -e "${FILE//\`/\\\`}" >> $GITHUB_STEP_SUMMARY
+          echo -e "$(cat ./embed.json)" >> $GITHUB_STEP_SUMMARY
           echo '```'' >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Message
