@@ -103,7 +103,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
           echo -e "$(cat ./embed.json)" >> $GITHUB_STEP_SUMMARY
-          echo '```'' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Message
         uses: tsickert/discord-webhook@v5.3.0
