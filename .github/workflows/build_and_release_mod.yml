@@ -70,11 +70,22 @@ jobs:
         shell: bash
         run: |
           mkdir ./dist
-          ls -l ./Forge/build/libs/
-          mv ./Forge/build/libs/${{ inputs.modid }}-*.jar ./dist
-          mv ./Fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
-          mv ./Neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
-          ls -l ./dist
+          if [ -d ./Forge/build/libs ]; then
+            echo "Copying Forge jar-file"
+            mv ./Forge/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
+
+          if [ -d ./Fabric/build/libs ]; then
+            echo "Copying Fabric jar-file"
+            mv ./Fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
+
+          if [ -d ./Neoforge/build/libs ]; then
+            echo "Copying Neoforge jar-file"
+            mv ./Neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
+
+          echo -e "${ls -l ./dist}"
 
       - name: Add files to release
         uses: shogo82148/actions-upload-release-asset@v1.7.5
