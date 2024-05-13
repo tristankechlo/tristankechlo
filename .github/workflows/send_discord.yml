@@ -99,7 +99,9 @@ jobs:
           sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
           sed -i "s|@description@|${DESCRIPTION}|g" ./embed.json
 
-          cat ./embed.json
+          echo "# Discord Message" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat ./embed.json)" >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Message
         uses: tsickert/discord-webhook@v5.3.0
