@@ -98,7 +98,7 @@ jobs:
           data = data.replace("@version@", "${{ inputs.mod-version }}")
           data = data.replace("@curseforge@", "${{ inputs.curseforge }}")
           data = data.replace("@modrinth@", "${{ inputs.modrinth }}")
-          data = data.replace("@timestamp@", datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z")
+          data = data.replace("@timestamp@", datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z")
           data = data.replace("@avatar@", "${{ inputs.avatar }}")
           
           data = json.dumps(json.loads(data))
