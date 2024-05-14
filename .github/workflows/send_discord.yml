@@ -3,22 +3,28 @@ name: Send Discord Message Mod-Release
 on:
   workflow_call:
     inputs:
-      changelog:
+      released: # whether or not the files were released to curseforge and modrinth
+        required: true
+        type: boolean
+      changelog: # the full changelog of the release
         required: true
         type: string
-      version:
+      version: # the version name of the release e.g. '1.20.4 - 1.1.1'
         required: true
         type: string
-      color:
+      color: # the color of the embed
         required: true
         type: number      
-      ping:
+      content:
         required: true
         type: string
       curseforge:
         required: true
         type: string
       modrinth:
+        required: true
+        type: string
+      github:
         required: true
         type: string
       title:
@@ -40,52 +46,62 @@ jobs:
     steps:
       - name: Checkout Sourcecode
         uses: actions/checkout@v4
+        with:
+          repository: tristankechlo/tristankechlo
 
-      - name: Download Template
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Go To Folder
+        run: cd discord_embed
+
+      - name: npm install
+        run: npm ci
+
+      - name: create .env File
         shell: bash
         run: |
-          URL="https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/data/embed.json"
-          wget -q -O './embed.json' "$URL"
+          touch .env
+          echo "CONTENT=\"${{ inputs.content }}\"" >> .env
+          echo "CHANGELOG=\"${{ inputs.changelog }}\"" >> .env
+          echo "RELEASED=\"${{ inputs.released }}\"" >> .env
+          echo "TITLE=\"${{ inputs.title }}\"" >> .env
+          echo "DESCRIPTION=\"${{ inputs.description }}\"" >> .env
+          echo "COLOR=\"${{ inputs.color }}\"" >> .env
+          echo "VERSION=\"${{ inputs.version }}\"" >> .env
+          echo "CURSEFORGE=\"${{ inputs.curseforge }}\"" >> .env
+          echo "MODRINTH=\"${{ inputs.modrinth }}\"" >> .env
+          echo "GITHUB=\"${{ inputs.github }}\"" >> .env
+          echo "THUMBNAIL=\"${{ inputs.thumbnail }}\"" >> .env
 
-      - name: Prepare Template
-        shell: python
-        run: |
-          import datetime
-          import json
-          
-          with open("./embed.json", "r") as f:
-            data = f.read()
-            f.close()
-          
-          changelog="""${{ inputs.changelog }}"""
-          changelog = changelog.strip()
-          changelog = changelog.replace("\n", "\\n")
-          
-          data = data.replace("@ping@", "${{ inputs.ping }}")
-          data = data.replace("@title@", "${{ inputs.title }}")
-          data = data.replace("@description@", "${{ inputs.description }}")
-          data = data.replace("\"@color@\"", "${{ inputs.color }}")
-          data = data.replace("@changelog@", changelog)
-          data = data.replace("@version@", "${{ inputs.version }}")
-          data = data.replace("@curseforge@", "${{ inputs.curseforge }}")
-          data = data.replace("@modrinth@", "${{ inputs.modrinth }}")
-          data = data.replace("@timestamp@", datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z")
-          data = data.replace("@thumbnail@", "${{ inputs.thumbnail }}")
-          
-          data = json.dumps(json.loads(data))
-          
-          with open("./embed.json", "w") as f:
-            f.write(data)
-            f.close()
+      - name: Make Embed
+        run: node ./make_embed.js
 
       - name: Display Template
         shell: bash
         run: |
-          echo "# Discord Message" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary><h4>.env File</h4></summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo -e "$(cat ./.env)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary><h4>Discord Message</h4></summary>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
-          echo -e "$(python -mjson.tool ./embed.json)" >> $GITHUB_STEP_SUMMARY
+          echo -e "$(cat ./embed.json)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Message
         uses: tsickert/discord-webhook@v5.3.0
