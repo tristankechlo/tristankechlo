@@ -1,6 +1,7 @@
 name: Build and Publish Release
 
-# trigger this workflow when a new release is published
+# only use this workflow when a new release is published
+# this workflow assumes some variables that are only present on github releases
 
 on:
   workflow_call:
@@ -8,36 +9,51 @@ on:
       modid:
         required: true
         type: string
+        description: used to locate the built jar-files
       mc-version:
         required: true
         type: string
+        description: the minecraft version of the build, used for publishing to curseforge and modrinth
       mod-version:
         required: true
         type: string
+        description: the version of the mod, used for publishing to curseforge and modrinth
       curseforge-id:
         required: true
         type: number
+        description: the project id for the mod
       modrinth-id:
         required: true
         type: string
+        description: the project id for the mod
       changelog:
         required: true
         type: string
+        description: changelog that is added while publishing to curseforge and modrinth, supports markdown
+      featured:
+        required: false
+        type: boolean
+        default: true
+        description: whether or not the file is marked as featured on modrinth, defaults to true
       forge:
         required: false
         type: boolean
         default: true
+        description: whether or not the build has forge files, defaults to true
       fabric:
         required: false
         type: boolean
         default: true
+        description: whether or not the build has fabric files, defaults to true
       neoforge:
         required: false
         type: boolean
         default: true
+        description: whether or not the build has neoforge files, defaults to true
       version-range:
         required: true
         type: string
+        description: what minecraft versions does this build support, used for curseforge and modrinth
     secrets:
       curseforge-token:
         required: true
@@ -56,6 +72,8 @@ jobs:
         with:
           distribution: "temurin"
           java-version: 17
+          cache: "gradle"
+          cache-dependency-path: "gradle.properties"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -66,28 +84,39 @@ jobs:
       - name: Execute Gradle build
         run: ./gradlew build
 
-      - name: Add files to release
+      - name: copy jar-files
+        shell: bash
+        run: |
+          mkdir ./dist
+          if [ -d ./Forge/build/libs ]; then
+            echo "Copying Forge jar-file"
+            mv ./Forge/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
+
+          if [ -d ./Fabric/build/libs ]; then
+            echo "Copying Fabric jar-file"
+            mv ./Fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
+
+          if [ -d ./Neoforge/build/libs ]; then
+            echo "Copying Neoforge jar-file"
+            mv ./Neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
+
+          echo -e "$(ls -lahG ./dist)"
+
+      - name: Add files to GitHub-Release
         uses: shogo82148/actions-upload-release-asset@v1.7.5
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: "${{ github.workspace }}/*(Fabric|Forge|Neoforge)/build/libs/${{ inputs.modid }}-*.jar"
-
-#      - name: Create Github Release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          name: "${{ inputs.mc-version }} - ${{ inputs.mod-version }}"
-#          tag: ${{ github.ref }}
-#          artifacts: "build/libs/${{ inputs.modid }}-*.jar"
-#          replacesArtifacts: false
-#          body: ${{ inputs.changelog }}
+          asset_path: "./dist/${{ inputs.modid }}-*.jar"
 
       - name: publish NeoForge
         if: ${{ inputs.neoforge == true }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ inputs.modrinth-id }}
-          modrinth-featured: true
+          modrinth-featured: ${{ inputs.featured }}
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
           modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - NeoForge
@@ -108,7 +137,7 @@ jobs:
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ inputs.modrinth-id }}
-          modrinth-featured: true
+          modrinth-featured: ${{ inputs.featured }}
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
           modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Fabric
@@ -130,7 +159,7 @@ jobs:
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ inputs.modrinth-id }}
-          modrinth-featured: true
+          modrinth-featured: ${{ inputs.featured }}
           modrinth-unfeature-mode: intersection
           modrinth-token: ${{ secrets.modrinth-token }}
           modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Forge
@@ -145,21 +174,3 @@ jobs:
           changelog: ${{ inputs.changelog }}
           game-versions: ${{ inputs.version-range }}
           game-version-filter: releases
-      
-# - name: Publish Files
-#   shell: bash
-#   env:
-#     MODRINTH_TOKEN: ${{ secrets.modrinth-token }}
-#     MODRINTH_PROJECT_ID: ${{ inputs.modrinth-id }}
-#     CURSEFORGE_TOKEN: ${{ secrets.curseforge-token }}
-#     CURSEFORGE_PROJECT_ID: ${{ inputs.curseforge-id }}
-#     MC_VERSION: ${{ inputs.mc-version }}
-#     MOD_VERSION: ${{ inputs.mod-version }}
-#     FILENAME_FORGE: "./forge/build/libs/${{ inputs.modid }}-forge-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
-#     FILENAME_FABRIC: "./fabric/build/libs/${{ inputs.modid }}-fabric-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
-#     FILENAME_NEOFORGE: "./neoforge/build/libs/${{ inputs.modid }}-neoforge-${{ inputs.mc-version }}-${{ inputs.mod-version }}.jar"
-#   run: |
-#     wget -q -O './release_curseforge.sh' "https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/scripts/release_curseforge.sh"
-#     wget -q -O './release_modrinth.sh' "https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/scripts/release_modrinth.sh"
-#     ./release_curseforge.sh
-#     ./release_modrinth.sh

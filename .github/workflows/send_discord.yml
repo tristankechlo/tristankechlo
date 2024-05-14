@@ -3,60 +3,115 @@ name: Send Discord Message Mod-Release
 on:
   workflow_call:
     inputs:
+      released:
+        required: true
+        type: boolean
+        description: whether or not the files were released to curseforge and modrinth
       changelog:
         required: true
         type: string
-      mc-version:
+        description: the full changelog of the release
+      version:
         required: true
         type: string
-      mod-version:
-        required: true
-        type: string
+        description: the version name of the release e.g. '1.20.4 - 1.1.1'
       color:
         required: true
         type: number      
-      ping:
+      content:
         required: true
         type: string
       curseforge:
         required: true
         type: string
+        description: link to the curseforge project page, only used when 'released == true'
       modrinth:
+        required: true
+        type: string
+        description: link to the modrinth project page, only used when 'released == true'
+      github:
+        required: true
+        type: string
+        description: link to the github release page
+      title:
         required: true
         type: string
       description:
         required: true
         type: string
-      avatar:
+      thumbnail:
         required: true
         type: string
     secrets:
-      webhook-url:
+      WEBHOOK_URL:
         required: true
 
 jobs:
-  send-embed:
+  send-discord-embed:
     runs-on: ubuntu-latest
     steps:
-      - name: prepare Discord Message
+      - name: Checkout Sourcecode
+        uses: actions/checkout@v4
+        with:
+          repository: tristankechlo/tristankechlo
+          path: './tk'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ./tk/discord_embed/package-lock.json
+
+      - name: npm install
+        working-directory: ./tk/discord_embed
+        run: npm ci
+
+      - name: create .env File
+        working-directory: ./tk/discord_embed
         shell: bash
         run: |
-          URL="https://raw.githubusercontent.com/tristankechlo/tristankechlo/main/data/embed.json"
-          wget -q -O './embed.json' "$URL"
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          sed -i "s|@timestamp@|${TIMESTAMP}|g" ./embed.json
-          sed -i "s|@changelog@|"${{ inputs.changelog }}"|g" ./embed.json
-          sed -i "s|@minecraft@/"${{ inputs.mc-version }}"|g" ./embed.json
-          sed -i "s|@version@|"${{ inputs.mod-version }}"|g" ./embed.json
-          sed -i "s|\"@color@|"/${{ inputs.color }}|g" ./embed.json
-          sed -i "s|@ping@|"${{ inputs.ping }}"|g" ./embed.json
-          sed -i "s|@curseforge@|"${{ inputs.curseforge }}"|g" ./embed.json
-          sed -i "s|@modrinth@|"${{ inputs.modrinth }}"|g" ./embed.json
-          sed -i "s|@avatar@|"${{ inputs.avatar }}"|g" ./embed.json
-          sed -i "s|@description@|"${{ inputs.description }}"|g" ./embed.json
+          touch .env
+          echo "CONTENT=\"${{ inputs.content }}\"" >> .env
+          echo "CHANGELOG=\"${{ inputs.changelog }}\"" >> .env
+          echo "RELEASED=\"${{ inputs.released }}\"" >> .env
+          echo "TITLE=\"${{ inputs.title }}\"" >> .env
+          echo "DESCRIPTION=\"${{ inputs.description }}\"" >> .env
+          echo "COLOR=\"${{ inputs.color }}\"" >> .env
+          echo "VERSION=\"${{ inputs.version }}\"" >> .env
+          echo "CURSEFORGE=\"${{ inputs.curseforge }}\"" >> .env
+          echo "MODRINTH=\"${{ inputs.modrinth }}\"" >> .env
+          echo "GITHUB=\"${{ inputs.github }}\"" >> .env
+          echo "THUMBNAIL=\"${{ inputs.thumbnail }}\"" >> .env
+
+      - name: Make Embed
+        working-directory: ./tk/discord_embed
+        run: node ./make_embed.js
+
+      - name: Display Template in GitHub-Action-Summary
+        working-directory: ./tk/discord_embed
+        shell: bash
+        run: |
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary><h4>.env File</h4></summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo -e "$(cat ./.env)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary><h4>Discord Message</h4></summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          echo -e "$(cat ./embed.json)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
 
       - name: Send Discord Message
-        uses: tsickert/discord-webhook@v5.3.0
+        uses: tsickert/discord-webhook@v6.0.0
         with:
-          webhook-url: ${{ secrets.webhook-url }}
-          raw-data: ./embed.json
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          raw-data: ./tk/discord_embed/embed.json
