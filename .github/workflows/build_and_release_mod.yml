@@ -110,6 +110,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: "./dist/${{ inputs.modid }}-*.jar"
+          overwrite: true
 
       - name: publish NeoForge
         if: ${{ inputs.neoforge == true }}
