@@ -4,7 +4,7 @@ import 'dotenv/config';
 
 // read input
 const content = `${process.env.CONTENT || ''}`.trim();
-let changelog = `${process.env.CHANGELOG}`.trim();
+let changelog = `${process.env.CHANGELOG}`.split("**Full Changelog**")[0].trim();
 const released = process.env.RELEASED == "true";
 const title = `${process.env.TITLE}`.trim();
 const description = `${process.env.DESCRIPTION}`.trim();
