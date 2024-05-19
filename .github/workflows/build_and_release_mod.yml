@@ -8,8 +8,8 @@ on:
     inputs:
       java-version:
         required: false
-        type: number
-        default: 17
+        type: string
+        default: '17'
         description: the java version to use for this build
       modid:
         required: true
