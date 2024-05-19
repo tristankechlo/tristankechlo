@@ -97,15 +97,27 @@ jobs:
             echo "Copying Forge jar-file"
             mv ./Forge/build/libs/${{ inputs.modid }}-*.jar ./dist
           fi
+          if [ -d ./forge/build/libs ]; then
+            echo "Copying Forge jar-file"
+            mv ./forge/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
 
           if [ -d ./Fabric/build/libs ]; then
             echo "Copying Fabric jar-file"
             mv ./Fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
           fi
+          if [ -d ./fabric/build/libs ]; then
+            echo "Copying Fabric jar-file"
+            mv ./fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
 
           if [ -d ./Neoforge/build/libs ]; then
             echo "Copying Neoforge jar-file"
             mv ./Neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
+          fi
+          if [ -d ./neoforge/build/libs ]; then
+            echo "Copying Neoforge jar-file"
+            mv ./neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
           fi
 
           echo -e "$(ls -lahG ./dist)"
