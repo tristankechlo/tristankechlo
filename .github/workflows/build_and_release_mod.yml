@@ -6,6 +6,11 @@ name: Build and Publish Release
 on:
   workflow_call:
     inputs:
+      java-version:
+        required: false
+        type: number
+        default: 17
+        description: the java version to use for this build
       modid:
         required: true
         type: string
@@ -71,7 +76,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: 17
+          java-version: ${{ inputs.java-version }}
           cache: "gradle"
           cache-dependency-path: "gradle.properties"
 
