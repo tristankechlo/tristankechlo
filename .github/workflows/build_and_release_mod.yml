@@ -40,21 +40,11 @@ on:
         type: boolean
         default: true
         description: whether or not the file is marked as featured on modrinth, defaults to true
-      forge:
+      publish:
         required: false
         type: boolean
         default: true
-        description: whether or not the build has forge files, defaults to true
-      fabric:
-        required: false
-        type: boolean
-        default: true
-        description: whether or not the build has fabric files, defaults to true
-      neoforge:
-        required: false
-        type: boolean
-        default: true
-        description: whether or not the build has neoforge files, defaults to true
+        description: whether or not the file will be released to curseforge and modrinth
       version-range:
         required: true
         type: string
@@ -89,35 +79,13 @@ jobs:
       - name: Execute Gradle build
         run: ./gradlew build
 
-      - name: copy jar-files
+      - name: copy jar-file
         shell: bash
         run: |
           mkdir ./dist
-          if [ -d ./Forge/build/libs ]; then
+          if [ -d ./build/libs ]; then
             echo "Copying Forge jar-file"
-            mv ./Forge/build/libs/${{ inputs.modid }}-*.jar ./dist
-          fi
-          if [ -d ./forge/build/libs ]; then
-            echo "Copying Forge jar-file"
-            mv ./forge/build/libs/${{ inputs.modid }}-*.jar ./dist
-          fi
-
-          if [ -d ./Fabric/build/libs ]; then
-            echo "Copying Fabric jar-file"
-            mv ./Fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
-          fi
-          if [ -d ./fabric/build/libs ]; then
-            echo "Copying Fabric jar-file"
-            mv ./fabric/build/libs/${{ inputs.modid }}-*.jar ./dist
-          fi
-
-          if [ -d ./Neoforge/build/libs ]; then
-            echo "Copying Neoforge jar-file"
-            mv ./Neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
-          fi
-          if [ -d ./neoforge/build/libs ]; then
-            echo "Copying Neoforge jar-file"
-            mv ./neoforge/build/libs/${{ inputs.modid }}-*.jar ./dist
+            mv ./build/libs/${{ inputs.modid }}-*.jar ./dist
           fi
 
           echo -e "$(ls -lahG ./dist)"
@@ -129,51 +97,8 @@ jobs:
           asset_path: "./dist/${{ inputs.modid }}-*.jar"
           overwrite: true
 
-      - name: publish NeoForge
-        if: ${{ inputs.neoforge == true }}
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-id: ${{ inputs.modrinth-id }}
-          modrinth-featured: ${{ inputs.featured }}
-          modrinth-unfeature-mode: intersection
-          modrinth-token: ${{ secrets.modrinth-token }}
-          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - NeoForge
-          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-NeoForge
-          curseforge-id: ${{ inputs.curseforge-id }}
-          curseforge-token: ${{ secrets.curseforge-token }}
-          curseforge-name: ""
-          curseforge-version: ""
-          version-type: release
-          loaders: neoforge
-          files: ./dist/*-neoforge-*jar
-          changelog: ${{ inputs.changelog }}
-          game-versions: ${{ inputs.version-range }}
-          game-version-filter: releases
-
-      - name: publish Fabric
-        if: ${{ inputs.fabric == true }}
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-id: ${{ inputs.modrinth-id }}
-          modrinth-featured: ${{ inputs.featured }}
-          modrinth-unfeature-mode: intersection
-          modrinth-token: ${{ secrets.modrinth-token }}
-          modrinth-name: ${{ inputs.mc-version }} - ${{ inputs.mod-version }} - Fabric
-          modrinth-version: ${{ inputs.mc-version }}-${{ inputs.mod-version }}-Fabric
-          curseforge-id: ${{ inputs.curseforge-id }}
-          curseforge-token: ${{ secrets.curseforge-token }}
-          curseforge-name: ""
-          curseforge-version: ""
-          version-type: release
-          loaders: fabric
-          files: ./dist/*-fabric-*jar
-          changelog: ${{ inputs.changelog }}
-          game-versions: ${{ inputs.version-range }}
-          dependencies: fabric-api(required)
-          game-version-filter: releases
-
       - name: publish Forge
-        if: ${{ inputs.forge == true }}
+        if: ${{ inputs.publish == true }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ inputs.modrinth-id }}
